@@ -1,0 +1,80 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: default-gateway
+  namespace: default
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+
+  - port:
+      name: http
+      number: 80
+      protocol: HTTP
+    hosts:
+    - "istio-dev.shoppo.com"
+
+
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: defaul-vs
+spec:
+  hosts:
+  - "istio-dev.shoppo.com"
+  gateways:
+  - default-gateway
+  http:
+
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        port:
+          number: 80
+        host: test-web    # 这里改成你的lb的name
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: grpc-random
+spec:
+  host: test-greeter
+  trafficPolicy:
+    loadBalancer:
+      simple: RANDOM
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: elasticsearch-dev
+spec:
+  hosts:
+  - "vpc-beer-dev-60-2jzfbxw74lenk5ugrd33fjnaae.us-west-2.es.amazonaws.com"
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: elasticsearch-dev
+spec:
+  hosts:
+  - "vpc-beer-dev-60-2jzfbxw74lenk5ugrd33fjnaae.us-west-2.es.amazonaws.com"
+  http:
+  - match:
+    - port: 80
+    route:
+    - destination:
+        host: vpc-beer-dev-60-2jzfbxw74lenk5ugrd33fjnaae.us-west-2.es.amazonaws.com
+        port:
+          number: 80
