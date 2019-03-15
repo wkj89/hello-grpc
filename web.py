@@ -5,12 +5,18 @@ import prometheus_client
 from prometheus_client import Counter
 
 from flask import Response, Flask, request
+from interceptor import header_adder_interceptor
 
 app = Flask(__name__)
 
 requests_total = Counter("request_count", "Total request cout of the host")
 channel = grpc.insecure_channel('test-greeter:50051')
-greeter_client = greeter_pb2_grpc.GreeterStub(channel)
+
+header_interceptor = header_adder_interceptor(request)
+
+intercept_channel = grpc.intercept_channel(channel, header_interceptor)
+
+greeter_client = greeter_pb2_grpc.GreeterStub(intercept_channel)
 
 
 @app.route("/metrics")
@@ -22,8 +28,7 @@ def requests_count():
 @app.route('/<name>', methods=['GET'])
 def hello(name):
     requests_total.inc()
-    response = greeter_client.SayHello(greeter_pb2.HelloRequest(name=name))
-
+    response = greeter_client.SayHello(greeter_pb2.HelloRequest(name=name, age=1))
     return response.message
 
 
@@ -33,4 +38,4 @@ def live():
 
 
 if __name__ == '__main__':
-    app.run("0.0.0.0",4000)
+    app.run("0.0.0.0", 4000)

@@ -57,7 +57,7 @@ ip-10-0-5-45.us-west-2.compute.internal    Ready     <none>    4d        v1.10.3
         - key: injector.tumblr.com/request  value :log-inject
    - Container
      - Environment Variables
-        - key: $ervice value: grpc
+        - key: $service value: grpc
      - Ports
         - Container Port:50051
         - name:grpc
