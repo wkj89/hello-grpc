@@ -2,28 +2,23 @@ import grpc
 
 import greeter_pb2_grpc
 import greeter_pb2
-import logging
 import socket
 import time
 from concurrent import futures
+from log import init_system_logger
+init_system_logger()
+
+import logging
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
-
-file_handler = logging.FileHandler("/log/grpc.log")
-file_handler.setLevel(logging.INFO)
-formatter = logging.Formatter('[%(asctime)s] - %(levelname)s -%(filename)s -%(lineno)d - %(message)s')
-
-file_handler.setFormatter(formatter)
-logging.getLogger().addHandler(file_handler)
-logging.getLogger().setLevel(logging.INFO)
-
 
 class Greeter(greeter_pb2_grpc.GreeterServicer):
 
     def SayHello(self, request, context):
         hostname = socket.gethostname()
-
-        print("get request from %s ,hostname: %s" % (request.name, hostname))
+        metadata = context.invocation_metadata()
+        logging.info(metadata)
+        logging.info("get request from %s ,hostname: %s" % (request.name, hostname))
         return greeter_pb2.HelloReply(message='Hello, %s , from %s!' % (request.name, hostname))
 
     def SayHelloAgain(self, request, context):
