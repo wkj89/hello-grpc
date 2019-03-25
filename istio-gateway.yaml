@@ -37,6 +37,8 @@ spec:
         port:
           number: 80
         host: test-web    # 这里改成你的lb的name
+    retries:
+      attempts: 5
 
 ---
 apiVersion: networking.istio.io/v1alpha3
@@ -78,3 +80,4 @@ spec:
         host: vpc-beer-dev-60-2jzfbxw74lenk5ugrd33fjnaae.us-west-2.es.amazonaws.com
         port:
           number: 80
+
