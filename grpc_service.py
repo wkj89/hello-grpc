@@ -2,20 +2,14 @@ import grpc
 
 import greeter_pb2_grpc
 import greeter_pb2
-import logging
 import socket
 import time
 from concurrent import futures
+from log import init_log
+init_log()
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
-file_handler = logging.FileHandler("/log/grpc.log")
-file_handler.setLevel(logging.INFO)
-formatter = logging.Formatter('[%(asctime)s] - %(levelname)s -%(filename)s -%(lineno)d - %(message)s')
-
-file_handler.setFormatter(formatter)
-logging.getLogger().addHandler(file_handler)
-logging.getLogger().setLevel(logging.INFO)
 
 
 class Greeter(greeter_pb2_grpc.GreeterServicer):
